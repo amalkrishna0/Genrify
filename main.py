@@ -1,12 +1,17 @@
 from auth import authenticate_spotify
-from function import *
+from function import get_liked_songs
 
 def main():
     sp = authenticate_spotify()  # Authenticate with Spotify
-    song_id = "6EDO9iiTtwNv6waLwa1UUq"  # Replace with an actual Spotify track ID
+    print("Fetching Liked Songs...")
 
-    genres = get_song_genre(sp, song_id)
-    print(f"Genres: {genres}")
+    liked_songs = get_liked_songs(sp)
+
+    print("\nYour Liked Songs:")
+    for song in liked_songs:
+        print(song)
+
+    print(f"\nTotal Liked Songs: {len(liked_songs)}")
 
 if __name__ == "__main__":
     main()
