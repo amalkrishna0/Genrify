@@ -47,17 +47,23 @@ def get_liked_songs(sp):
 
 
 def get_genre_songs(user_genre):
+    count = 1
     with open("songs.txt", "r") as file, open("songs_on_genre.txt", "w") as genre_file:
         for line in file:
-            song_name, artist = line.strip().split("*")
+            try:
+                song_name, artist = line.strip().split("*")
+            except ValueError:
+                print(f"{count} Skipping invalid line: {line.strip()}")
+                continue  
             
             # Use the model to predict the genre of the song
             genre_match = get_genre_from_hf(song_name, artist, user_genre)
             
             if genre_match == "YES":
-                print(f"Saving {song_name} by {artist} to songs_on_genre.txt!")
+                print(f"{count} - Saving {song_name} by {artist} to songs_on_genre.txt!")
                 genre_file.write(f"{song_name} - {artist}\n")
-        
+            count += 1 
+
     
 
 
