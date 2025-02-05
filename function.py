@@ -83,10 +83,12 @@ def get_track_uri(sp, song_name, artist):
         return None
     return tracks[0]["uri"]
 
+import time
 
 def add_songs_to_playlist(sp, playlist_id):
     track_uris = []
 
+    # Read the song list from the file
     with open("songs_on_genre.txt", "r", encoding="utf-8") as file:
         for line in file:
             parts = line.strip().split(" - ")
@@ -99,8 +101,16 @@ def add_songs_to_playlist(sp, playlist_id):
             if uri:
                 track_uris.append(uri)
 
+    # Batch adding songs to the playlist
     if track_uris:
-        sp.playlist_add_items(playlist_id, track_uris)
-        print(f"Added {len(track_uris)} songs to playlist!")
+        chunk_size = 100  # Spotify allows adding max 100 tracks per request
+        for i in range(0, len(track_uris), chunk_size):
+            batch = track_uris[i:i+chunk_size]
+            try:
+                sp.playlist_add_items(playlist_id, batch)
+                print(f"Added {len(batch)} songs to playlist!")
+                time.sleep(1)  # Avoid hitting rate limits
+            except Exception as e:
+                print(f"Error adding batch {i//chunk_size + 1}: {e}")
     else:
         print("No valid songs found to add!")
