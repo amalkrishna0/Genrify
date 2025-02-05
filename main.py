@@ -14,7 +14,7 @@ def main():
     print(f"Creating playlist: {playlist_name}...")
     playlist_id = create_playlist(sp, playlist_name)
 
-    user_genre = input("Enter your genre to create a playlist: ").strip().lower()
+    user_genre = input("Filtering songs based on genre...").strip().lower()
     get_genre_songs(user_genre)
 
     print("Adding songs to playlist...")
