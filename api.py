@@ -40,4 +40,3 @@ song_name = "not like us"
 artist = "kendrick lamar"
 user_genre = "Rap"
 result = get_genre_from_hf(song_name, artist, user_genre)
-print(f"Does the song match the genre '{user_genre}'? {result}")
