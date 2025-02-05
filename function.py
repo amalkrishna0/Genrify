@@ -1,6 +1,7 @@
+from api import get_genre_from_hf
 def get_liked_songs(sp):
     liked_songs = []
-    results = sp.current_user_saved_tracks(limit=50)  # First batch
+    results = sp.current_user_saved_tracks(limit=50)  
 
     while results:
         for item in results["items"]:
@@ -8,36 +9,32 @@ def get_liked_songs(sp):
             liked_songs.append({
                 "name": track["name"],
                 "artist": track["artists"][0]["name"],
-                "album": track["album"]["name"],  # Fetch album name
+                "album": track["album"]["name"],  
                 "id": track["id"],
-                "genres": []  # Placeholder for genres
+                "genres": []  
             })
 
         results = sp.next(results) if results["next"] else None
 
     # Sort the songs alphabetically by album name
-    liked_songs.sort(key=lambda song: song["album"].lower())  # Case-insensitive sorting
+    liked_songs.sort(key=lambda song: song["album"].lower())  
 
     # Save to text file
-    with open("songs.txt", "w", encoding="utf-8") as file:
+    with open("songs.txt", "w") as file:
         for song in liked_songs:
-            file.write(f"{song['album']} - {song['name']} - {song['artist']} (ID: {song['id']})\n")
+            file.write(f"{song['name']}*{song['artist']}\n")
 
     return liked_songs
 
 
-
-def get_song_genre(sp, song_id):
-    # Fetch track details
-    track_info = sp.track(song_id)
-    
-    # Get the first artist's ID
-    artist_id = track_info["artists"][0]["id"]
-    
-    # Fetch artist details
-    artist_info = sp.artist(artist_id)
-    
-    # Extract genres
-    genres = artist_info.get("genres", [])
-
-    return genres
+def get_genre_songs(user_genre):
+    with open("songs.txt", "r") as file, open("songs_on_genre.txt", "w") as genre_file:
+        for line in file:
+            song_name, artist = line.strip().split("*")
+            
+            # Use the model to predict the genre of the song
+            genre_match = get_genre_from_hf(song_name, artist, user_genre)
+            
+            if genre_match == "YES":
+                print(f"Saving {song_name} by {artist} to songs_on_genre.txt!")
+                genre_file.write(f"{song_name} - {artist}\n")
