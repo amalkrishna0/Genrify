@@ -1,3 +1,4 @@
 .env
 .cache
 songs.txt
+songs_on_genre.txt
