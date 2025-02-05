@@ -15,6 +15,7 @@ def authenticate_spotify():
     ))
     return sp
 
+
 def get_liked_songs(sp):
     liked_songs = []
     results = sp.current_user_saved_tracks(limit=50)  
@@ -43,6 +44,8 @@ def get_liked_songs(sp):
     return liked_songs
 
 
+
+
 def get_genre_songs(user_genre):
     with open("songs.txt", "r") as file, open("songs_on_genre.txt", "w") as genre_file:
         for line in file:
@@ -57,7 +60,41 @@ def get_genre_songs(user_genre):
         
     
 
+
 def create_playlist(sp, playlist_name):
-    user_id = sp.current_user()["id"]  # Get User ID
+    user_id = sp.current_user()["id"]
     playlist = sp.user_playlist_create(user=user_id, name=playlist_name, public=False)
-    return playlist["id"]  # Return the new playlist ID
+    return playlist["id"]
+
+
+def get_track_uri(sp, song_name, artist):
+    query = f"track:{song_name} artist:{artist}"
+    results = sp.search(q=query, type="track", limit=1)
+    
+    tracks = results.get("tracks", {}).get("items", [])
+    if not tracks:
+        print(f"Could not find: {song_name} by {artist}")
+        return None
+    return tracks[0]["uri"]
+
+
+def add_songs_to_playlist(sp, playlist_id):
+    track_uris = []
+
+    with open("songs_on_genre.txt", "r", encoding="utf-8") as file:
+        for line in file:
+            parts = line.strip().split(" - ")
+            if len(parts) != 2:
+                print(f"Skipping invalid line: {line.strip()}")
+                continue
+
+            song_name, artist = parts
+            uri = get_track_uri(sp, song_name, artist)
+            if uri:
+                track_uris.append(uri)
+
+    if track_uris:
+        sp.playlist_add_items(playlist_id, track_uris)
+        print(f"Added {len(track_uris)} songs to playlist!")
+    else:
+        print("No valid songs found to add!")
