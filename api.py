@@ -34,9 +34,3 @@ def get_genre_from_hf(song_name, artist, user_genre):
     predicted_output = result[0]["generated_text"].strip().upper()
     yesORno=predicted_output.split()[len(predicted_output.split())-1]
     return "YES" if "YES" in yesORno else "NO"
-
-# 
-song_name = "not like us"
-artist = "kendrick lamar"
-user_genre = "Rap"
-result = get_genre_from_hf(song_name, artist, user_genre)
