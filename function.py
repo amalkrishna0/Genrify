@@ -8,13 +8,23 @@ def get_liked_songs(sp):
             liked_songs.append({
                 "name": track["name"],
                 "artist": track["artists"][0]["name"],
+                "album": track["album"]["name"],  # Fetch album name
                 "id": track["id"],
-                "genres": []  # Placeholder, as Spotify API doesn't provide genres for individual tracks
+                "genres": []  # Placeholder for genres
             })
 
         results = sp.next(results) if results["next"] else None
 
+    # Sort the songs alphabetically by album name
+    liked_songs.sort(key=lambda song: song["album"].lower())  # Case-insensitive sorting
+
+    # Save to text file
+    with open("songs.txt", "w", encoding="utf-8") as file:
+        for song in liked_songs:
+            file.write(f"{song['album']} - {song['name']} - {song['artist']} (ID: {song['id']})\n")
+
     return liked_songs
+
 
 
 def get_song_genre(sp, song_id):
